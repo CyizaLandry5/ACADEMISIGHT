@@ -8,7 +8,7 @@ The system improves planning, reduces confusion, and ensures no student loses mo
 
 ---
 
-## **Why AcademiSight? (Problem Statement)**
+## **Why AcademiSight?**
 
 Many universities face the following challenges:
 
@@ -156,7 +156,7 @@ It improves clarity, decision-making, and academic planning for all stakeholders
 
 ---
 
-## **Motivation (for applications & recruiters)**
+## **Motivation**
 
 As a class representative, I saw firsthand how students struggled to track which modules they had completed or missed, particularly those who transferred from other institutions. This caused timetable conflicts, unnecessary retakes, and confusion for HODs when planning academic delivery.
 
