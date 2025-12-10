@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Summary — AcademiSight</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-xl">
+    <h1 class="text-xl font-bold text-center text-slate-800 mb-2">
+      Step 5 — Module Summary
+    </h1>
+    <p id="studentInfo" class="text-xs text-center text-slate-500 mb-6"></p>
+
+    <p id="error" class="text-red-600 text-center mb-3 text-sm"></p>
+
+    <div id="summaryCards" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs text-slate-600">
+      <p class="font-semibold text-slate-700 mb-1">Interpretation:</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li><span class="font-semibold text-emerald-700">Completed</span>: modules you have already covered.</li>
+        <li><span class="font-semibold text-amber-700">Not Covered</span>: modules to request or plan.</li>
+        <li><span class="font-semibold text-purple-700">Exempted</span>: modules you are exempted from.</li>
+      </ul>
+    </div>
+
+    <div class="mt-4 flex justify-between gap-3">
+      <button onclick="window.location.href='index.html';"
+              class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 rounded-lg text-sm">
+        Start Over
+      </button>
+      <button onclick="window.location.href='modules.html?page=1';"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm">
+        Review Modules
+      </button>
+    </div>
+  </div>
+
+  <script>
+  let student = null;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    student = getStudentOrRedirect();
+    document.getElementById("studentInfo").textContent =
+      `Reg No: ${student.reg_no || ""}  •  University ID: ${student.university_id}  •  Department ID: ${student.department_id || "Not set"}`;
+
+    loadSummary();
+  });
+
+  async function loadSummary() {
+    const errorEl = document.getElementById("error");
+    const cards = document.getElementById("summaryCards");
+
+    errorEl.textContent = "";
+    cards.innerHTML = "<p class='text-center text-sm text-slate-500 col-span-4'>Loading summary...</p>";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "getStudentSummary",
+          studentId: student.id
+        })
+      });
+
+      const data = await getJsonResponse(res);
+
+      if (!data.ok) {
+        errorEl.textContent = data.message || "Failed to load summary.";
+        cards.innerHTML = "";
+        return;
+      }
+
+      const s = data.summary;
+
+      cards.innerHTML = `
+        <div class="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
+          <p class="text-xs text-slate-500 mb-1">Total Modules</p>
+          <p class="text-2xl font-bold text-slate-800">${s.total}</p>
+        </div>
+        <div class="bg-emerald-50 rounded-lg border border-emerald-200 p-3 text-center">
+          <p class="text-xs text-emerald-600 mb-1">Completed</p>
+          <p class="text-2xl font-bold text-emerald-700">${s.completed}</p>
+        </div>
+        <div class="bg-amber-50 rounded-lg border border-amber-200 p-3 text-center">
+          <p class="text-xs text-amber-600 mb-1">Not Covered</p>
+          <p class="text-2xl font-bold text-amber-700">${s.not_covered}</p>
+        </div>
+        <div class="bg-purple-50 rounded-lg border border-purple-200 p-3 text-center">
+          <p class="text-xs text-purple-600 mb-1">Exempted</p>
+          <p class="text-2xl font-bold text-purple-700">${s.exempted}</p>
+        </div>
+      `;
+    } catch (err) {
+      errorEl.textContent = err.message || "Unexpected error.";
+      cards.innerHTML = "";
+    }
+  }
+  </script>
+</body>
+</html>
