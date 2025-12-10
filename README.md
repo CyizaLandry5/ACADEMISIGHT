@@ -62,10 +62,19 @@ These issues create:
 ## **System Flow**
 
 1. Student enters registration number, full name, and university code.
+<img width="706" height="739" alt="image" src="https://github.com/user-attachments/assets/b30c0dbd-66ec-4dd4-b0dd-0a01ab1038c3" />
+
 2. Student selects their department.
+<img width="733" height="466" alt="image" src="https://github.com/user-attachments/assets/9b7b3904-1fe6-464e-a7e3-dcfa3e3db7fb" />
+
 3. Student marks each module as “Completed”, “Not Covered”, or “Exempted.”
+<img width="975" height="862" alt="image" src="https://github.com/user-attachments/assets/c18593d9-02e5-4326-b00d-18a17ccb3eba" />
+
 4. Student adds contact information.
+<img width="727" height="556" alt="image" src="https://github.com/user-attachments/assets/977b49a3-dc71-405b-ab19-ca34273ed72b" />
+
 5. A full academic summary is generated automatically.
+<img width="906" height="767" alt="image" src="https://github.com/user-attachments/assets/9d7d1974-5775-4b6f-a9af-d3c85f4f36ac" />
 
 Backend stores:
 
