@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modules — AcademiSight</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-2xl">
+    <h1 class="text-xl font-bold text-slate-800 mb-2 text-center">
+      Step 3 — Mark Modules
+    </h1>
+    <p id="subtitle" class="text-xs text-center text-slate-500 mb-4"></p>
+
+    <p id="error" class="text-red-600 text-center mb-3 text-sm"></p>
+
+    <div id="modulesContainer" class="space-y-4 mb-6"></div>
+
+    <div class="flex items-center justify-between gap-3">
+      <button id="prevBtn"
+              class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+        Prev
+      </button>
+
+      <span id="pageInfo" class="text-xs text-slate-500 text-center w-24"></span>
+
+      <button id="nextBtn"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+        Next
+      </button>
+    </div>
+
+    <button id="contactsBtn"
+            class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm">
+      Continue to Contacts
+    </button>
+  </div>
+
+  <script>
+  let student = null;
+  let currentModules = [];
+  let currentPage = 1;
+  let totalPages = 1;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    student = getStudentOrRedirect();
+    const pageParam = parseInt(getQueryParam("page") || "1", 10);
+    currentPage = isNaN(pageParam) ? 1 : pageParam;
+
+    document.getElementById("subtitle").textContent =
+      `Reg No: ${student.reg_no || student.regNo || ""}`;
+
+    document.getElementById("prevBtn").addEventListener("click", () => navigatePage(-1));
+    document.getElementById("nextBtn").addEventListener("click", () => navigatePage(1));
+    document.getElementById("contactsBtn").addEventListener("click", goContacts);
+
+    loadModulesPage(currentPage);
+  });
+
+  async function loadModulesPage(page) {
+    const errorEl = document.getElementById("error");
+    const container = document.getElementById("modulesContainer");
+    const pageInfo = document.getElementById("pageInfo");
+
+    errorEl.textContent = "";
+    container.innerHTML = "<p class='text-center text-sm text-slate-500'>Loading modules...</p>";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "getModulesPage",
+          studentId: student.id,
+          departmentId: student.department_id,
+          universityId: student.university_id,
+          page: page,
+          pageSize: 5
+        })
+      });
+
+      const data = await getJsonResponse(res);
+
+      if (!data.ok) {
+        errorEl.textContent = data.message || "Failed to load modules.";
+        container.innerHTML = "";
+        return;
+      }
+
+      currentModules = data.modules || [];
+      currentPage = data.page;
+      totalPages = data.totalPages;
+
+      container.innerHTML = "";
+
+      if (!currentModules.length) {
+        container.innerHTML = "<p class='text-center text-sm text-slate-500'>No modules found.</p>";
+      } else {
+        currentModules.forEach(m => {
+          const div = document.createElement("div");
+          div.className = "border border-slate-200 rounded-lg p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2";
+
+          div.innerHTML = `
+            <div>
+              <p class="text-sm font-semibold text-slate-800">
+                ${m.module_code} — ${m.module_name}
+              </p>
+            </div>
+            <div>
+              <select id="mod-${m.id}"
+                      class="w-full md:w-48 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Status</option>
+                <option value="completed" ${m.status === "completed" ? "selected" : ""}>Completed</option>
+                <option value="not_covered" ${m.status === "not_covered" ? "selected" : ""}>Not Covered</option>
+                <option value="exempted" ${m.status === "exempted" ? "selected" : ""}>Exempted</option>
+              </select>
+            </div>
+          `;
+
+          container.appendChild(div);
+        });
+      }
+
+      pageInfo.textContent = `Page ${currentPage}/${totalPages}`;
+      document.getElementById("prevBtn").disabled = currentPage <= 1;
+      document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+
+    } catch (err) {
+      errorEl.textContent = err.message || "Unexpected error.";
+      container.innerHTML = "";
+    }
+  }
+
+  async function saveCurrentPageStatuses() {
+    const statuses = currentModules.map(m => ({
+      moduleId: m.id,
+      status: document.getElementById(`mod-${m.id}`).value
+    })).filter(item => item.status);
+
+    if (!statuses.length) return;
+
+    await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "saveModuleStatuses",
+        studentId: student.id,
+        statuses
+      })
+    });
+  }
+
+  async function navigatePage(delta) {
+    const target = currentPage + delta;
+    if (target < 1 || target > totalPages) return;
+
+    await saveCurrentPageStatuses();
+    window.location.href = `modules.html?page=${target}`;
+  }
+
+  async function goContacts() {
+    await saveCurrentPageStatuses();
+    window.location.href = "contacts.html";
+  }
+  </script>
+</body>
+</html>
