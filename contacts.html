@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contacts — AcademiSight</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+    <h1 class="text-xl font-bold text-center text-slate-800 mb-2">
+      Step 4 — Contact Information
+    </h1>
+    <p class="text-xs text-center text-slate-500 mb-4">
+      Optional, but helps class reps and HOD reach you.
+    </p>
+
+    <p id="error" class="text-red-600 text-center mb-3 text-sm"></p>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          Phone (WhatsApp preferred)
+        </label>
+        <input id="phone" type="text"
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          Email Address
+        </label>
+        <input id="email" type="email"
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+
+    <button id="saveBtn"
+            class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm">
+      Save & View Summary
+    </button>
+  </div>
+
+  <script>
+  let student = null;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    student = getStudentOrRedirect();
+    document.getElementById("saveBtn").addEventListener("click", saveContacts);
+  });
+
+  async function saveContacts() {
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const errorEl = document.getElementById("error");
+
+    errorEl.textContent = "";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "saveContacts",
+          studentId: student.id,
+          phone,
+          email
+        })
+      });
+
+      const data = await getJsonResponse(res);
+
+      if (!data.ok) {
+        errorEl.textContent = data.message || "Failed to save contacts.";
+        return;
+      }
+
+      // Update student locally
+      localStorage.setItem("student", JSON.stringify(data.student));
+
+      window.location.href = "summary.html";
+    } catch (err) {
+      errorEl.textContent = err.message || "Unexpected error.";
+    }
+  }
+  </script>
+</body>
+</html>
