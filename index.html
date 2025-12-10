@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AcademiSight — Student Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center text-slate-800 mb-2">AcademiSight</h1>
+    <p class="text-sm text-center text-slate-500 mb-6">
+      Smart module tracking for universities
+    </p>
+
+    <h2 class="text-xl font-semibold text-slate-700 mb-4 text-center">
+      Step 1 — Student Information
+    </h2>
+
+    <p id="error" class="text-red-600 text-center mb-3 text-sm"></p>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          Registration Number <span class="text-red-500">*</span>
+        </label>
+        <input id="regNo" type="text" placeholder="25*****"
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          Full Name (optional)
+        </label>
+        <input id="fullName" type="text" placeholder="eg. Cyiza Landry"
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          University Code <span class="text-red-500">*</span>
+        </label>
+        <input id="universityCode" type="text" placeholder="eg. UOK (contact your Universtiy)"
+               class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+
+    <button id="submitBtn"
+            class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+      Continue
+    </button>
+  </div>
+
+  <script>
+  document.getElementById("submitBtn").addEventListener("click", initStudent);
+
+  async function initStudent() {
+    const regNo = document.getElementById("regNo").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+    const uniCode = document.getElementById("universityCode").value.trim();
+    const errorEl = document.getElementById("error");
+
+    errorEl.textContent = "";
+
+    if (!regNo || !uniCode) {
+      errorEl.textContent = "Registration number & university code are required.";
+      return;
+    }
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "initStudent",
+          regNo,
+          fullName,
+          universityCode: uniCode
+        })
+      });
+
+      const data = await getJsonResponse(res);
+
+      if (!data.ok) {
+        errorEl.textContent = data.message || "Failed to initialize student.";
+        return;
+      }
+
+      // Save to localStorage
+      localStorage.setItem("student", JSON.stringify(data.student));
+      localStorage.setItem("university", JSON.stringify(data.university));
+      localStorage.setItem("departments", JSON.stringify(data.departments));
+
+      // Go to department selection
+      window.location.href = "department.html";
+    } catch (err) {
+      errorEl.textContent = err.message || "Unexpected error.";
+    }
+  }
+  </script>
+</body>
+</html>
