@@ -2,7 +2,7 @@
 
 Smart module tracking system for universities
 
-AcademiSight is a lightweight full-stack academic tracking system built to help students, class representatives, and Heads of Departments (HODs) easily track module completion. It solves the common challenge faced by universities where students—especially transferred students, weekend learners, day/evening programs struggle to know which modules they still need, which they have covered, and which they are exempted from.
+AcademiSight is a lightweight full-stack academic tracking system built to help students, class representatives, and Heads of Departments (HODs) easily track module completion. It solves the common challenge faced by universities where students especially transferred students, weekend learners, day/evening programs struggle to know which modules they still need, which they have covered, and which they are exempted from.
 
 The system improves planning, reduces confusion, and ensures no student loses modules during their academic journey.
 
