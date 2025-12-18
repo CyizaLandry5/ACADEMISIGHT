@@ -26,7 +26,7 @@ These issues create:
 * Manual administrative work
 * Unhappy students
 
-**AcademiSight fixes this by giving every student a clear, personalized module-tracking dashboard backed by a real-time database.**
+**AcademiSight fixes this by giving every student a clear, personalized module tracking dashboard backed by a real-time database.**
 
 ---
 
