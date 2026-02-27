@@ -1,5 +1,5 @@
 // ====== GLOBAL CONFIG ======
-const API_URL = "https://script.google.com/macros/s/AKfycbxmeyDsfgp_RNa9jKTqRbTPSCksU-3XgG8OKCAYZ2pSRF1cnMFXKeji3qZXFfMUdZe6/exec";
+const API_URL = "______FILL THIS_____________";
 
 // ====== UTILITIES ======
 function getStudentOrRedirect() {
